@@ -6,9 +6,13 @@ from typing import NoReturn
 
 from repo_health_card.analyzer import analyze_repository
 from repo_health_card.github import GitHubApiError, GitHubClient
-from repo_health_card.renderers import render_json, render_markdown
+from repo_health_card.renderers import render_badge, render_json, render_markdown
 
-FORMATTERS = {"json": render_json, "markdown": render_markdown}
+FORMATTERS = {
+    "badge": render_badge,
+    "json": render_json,
+    "markdown": render_markdown,
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
