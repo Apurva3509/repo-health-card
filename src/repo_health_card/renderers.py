@@ -23,3 +23,27 @@ def render_markdown(report: HealthReport) -> str:
 
 def render_json(report: HealthReport) -> str:
     return json.dumps(report.to_dict(), indent=2, sort_keys=True) + "\n"
+
+def render_shields_json(report: HealthReport) -> str:
+    """Renders a Shields.io custom endpoint JSON with documented thresholds."""
+    percentage = 0
+    if report.maximum_score > 0:
+        percentage = (report.score / report.maximum_score) * 100
+
+    # Score-to-color thresholds
+    if percentage >= 90:
+        color = "green"
+    elif percentage >= 70:
+        color = "yellow"
+    elif percentage >= 50:
+        color = "orange"
+    else:
+        color = "red"
+
+    payload = {
+        "schemaVersion": 1,
+        "label": "health",
+        "message": f"{report.score}/{report.maximum_score}",
+        "color": color
+    }
+    return json.dumps(payload, indent=2) + "\n"

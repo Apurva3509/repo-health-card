@@ -46,3 +46,11 @@ issue tracker for planned improvements.
 ## License
 
 [MIT](LICENSE)
+
+### Generate Shields.io Badge
+
+You can generate a JSON endpoint compatible with [Shields.io](https://shields.io/endpoint) custom badges using the CLI:
+
+```bash
+repo-health-card Apurva3509/repo-health-card --format shields > endpoint.json
+```

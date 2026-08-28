@@ -2,7 +2,7 @@ import json
 import unittest
 
 from repo_health_card.models import CheckResult, HealthReport
-from repo_health_card.renderers import render_json, render_markdown
+from repo_health_card.renderers import render_json, render_markdown, render_shields_json
 
 
 class RenderersTest(unittest.TestCase):
@@ -29,6 +29,28 @@ class RenderersTest(unittest.TestCase):
         self.assertEqual(output["score"], 60)
         self.assertFalse(output["checks"][1]["passed"])
 
+    def test_shields_json_format_and_boundaries(self) -> None:
+        # Default report has 60/100 score (60%), which should be orange
+        output = json.loads(render_shields_json(self.report))
+        self.assertEqual(output["schemaVersion"], 1)
+        self.assertEqual(output["label"], "health")
+        self.assertEqual(output["message"], "60/100")
+        self.assertEqual(output["color"], "orange")
+
+        # Helper function to test other boundary colors
+        def make_report(score: int) -> HealthReport:
+            return HealthReport(
+                repository="test/repo",
+                checks=(
+                    CheckResult("p", "P", True, score, ""),
+                    CheckResult("f", "F", False, 100 - score, "")
+                )
+            )
+
+        # Testing boundary scores
+        self.assertEqual(json.loads(render_shields_json(make_report(90)))["color"], "green")
+        self.assertEqual(json.loads(render_shields_json(make_report(70)))["color"], "yellow")
+        self.assertEqual(json.loads(render_shields_json(make_report(49)))["color"], "red")
 
 if __name__ == "__main__":
     unittest.main()
