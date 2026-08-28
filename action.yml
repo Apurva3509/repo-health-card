@@ -1,0 +1,30 @@
+name: Repo Health Card
+description: Generate a repository health report in the GitHub Actions job summary
+author: Apurva Patel
+
+inputs:
+  repository:
+    description: Repository in owner/name form
+    default: ${{ github.repository }}
+  token:
+    description: Token used to read repository metadata
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Generate repository health card
+      shell: bash
+      env:
+        REPO_HEALTH_CARD_REPOSITORY: ${{ inputs.repository }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: |
+        report_file="${RUNNER_TEMP}/repo-health-card.md"
+        PYTHONPATH="${GITHUB_ACTION_PATH}/src" python -m repo_health_card \
+          "${REPO_HEALTH_CARD_REPOSITORY}" --output "${report_file}"
+        tee -a "${GITHUB_STEP_SUMMARY}" < "${report_file}"
+
+branding:
+  icon: activity
+  color: green
+
